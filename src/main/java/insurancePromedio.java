@@ -35,6 +35,7 @@ public class insurancePromedio extends DefaultHandler {
     private String keyword;
 
     private HashMap<String, Double> subtotales;
+    private HashMap<String, Integer> contadorMap;
 
     public insurancePromedio() {
         super();
@@ -45,6 +46,7 @@ public class insurancePromedio extends DefaultHandler {
         spf.setValidating(true);
 
         subtotales = new HashMap<>();
+        contadorMap = new HashMap<>();
     }
 
     private void process(File file) {
@@ -78,7 +80,8 @@ public class insurancePromedio extends DefaultHandler {
         // Se proceso todo el documento, imprimir resultado
         Set<Map.Entry<String,Double>> entries = subtotales.entrySet();
         for (Map.Entry<String,Double> entry: entries) {
-            System.out.printf("%-15.15s $%,9.2f\n",entry.getKey(),entry.getValue());
+            double promedio = entry.getValue() / contadorMap.get(entry.getKey());
+            System.out.printf("%-15.15s $%,9.2f\n",entry.getKey(),promedio);
         }
     }
 
@@ -135,8 +138,11 @@ public class insurancePromedio extends DefaultHandler {
             if ( subtotales.containsKey(this.model) ) {
                 double sum = subtotales.get(this.model);
                 subtotales.put( this.model, sum + val );
+                int a = contadorMap.get(this.model);
+                contadorMap.put(this.model, a+1);
             } else {
                 subtotales.put(this.model, val );
+                contadorMap.put(this.model, 1);
             }
 
             inSales = false;

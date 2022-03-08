@@ -10,7 +10,7 @@
       <xs:element type="xs:string" name="car"/>
       <xs:element type="xs:string" name="model"/>
       <xs:element type="xs:string" name="insurance"/>
-      <xs:element type="xs:string" name="contract_date"/>
+      <xs:element type="xs:date" name="contract_date"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="datasetType">

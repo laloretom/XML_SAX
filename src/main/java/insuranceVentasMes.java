@@ -7,6 +7,8 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -132,11 +134,14 @@ public class insuranceVentasMes extends DefaultHandler {
                 LOG.severe(e.getMessage());
             }
 
-            if ( subtotales.containsKey(this.model) ) {
-                double sum = subtotales.get(this.model);
-                subtotales.put( this.model, sum + val );
+            LocalDate date = LocalDate.parse(this.contract);
+            String mes = date.getMonth().toString();
+
+            if ( subtotales.containsKey(mes)){
+                double sum = subtotales.get(mes);
+                subtotales.put( mes, sum + val );
             } else {
-                subtotales.put(this.model, val );
+                subtotales.put(mes, val );
             }
 
             inSales = false;

@@ -7,7 +7,9 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -15,6 +17,7 @@ import java.util.logging.Logger;
 public class insuranceVentasMesMarca extends DefaultHandler {
     private static final String CLASS_NAME = insuranceVentasMesMarca.class.getName();
     private final static Logger LOG = Logger.getLogger(CLASS_NAME);
+    private static String modelo;
 
     private SAXParser parser = null;
     private SAXParserFactory spf;
@@ -43,8 +46,8 @@ public class insuranceVentasMesMarca extends DefaultHandler {
         spf.setNamespaceAware(true);
         // validar que el documento este bien formado (well formed)
         spf.setValidating(true);
-
         subtotales = new HashMap<>();
+        
     }
 
     private void process(File file) {
@@ -77,6 +80,7 @@ public class insuranceVentasMesMarca extends DefaultHandler {
     public void endDocument() throws SAXException {
         // Se proceso todo el documento, imprimir resultado
         Set<Map.Entry<String,Double>> entries = subtotales.entrySet();
+        System.out.println("Marca: " + modelo);
         for (Map.Entry<String,Double> entry: entries) {
             System.out.printf("%-15.15s $%,9.2f\n",entry.getKey(),entry.getValue());
         }
@@ -124,22 +128,28 @@ public class insuranceVentasMesMarca extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if ( localName.equals("insurance_record") ) {
-            double val = 0.0;
-            try {
-                val = Double.parseDouble(this.insurance);
-            } catch (NumberFormatException e) {
-                LOG.severe(e.getMessage());
-            }
+        if ( localName.equals("insurance_record") )
+        {
+            if (this.car.toLowerCase().equals(modelo)) {
+                double val = 0.0;
+                try {
+                    val = Double.parseDouble(this.insurance);
+                } catch (NumberFormatException e) {
+                    LOG.severe(e.getMessage());
+                }
 
-            if ( subtotales.containsKey(this.model) ) {
-                double sum = subtotales.get(this.model);
-                subtotales.put( this.model, sum + val );
-            } else {
-                subtotales.put(this.model, val );
-            }
+                LocalDate date = LocalDate.parse(this.contract);
+                String mes = date.getMonth().toString();
 
-            inSales = false;
+                if (subtotales.containsKey(mes)) {
+                    double sum = subtotales.get(mes);
+                    subtotales.put(mes, sum + val);
+                } else {
+                    subtotales.put(mes, val);
+                }
+
+                inSales = false;
+            }
         }
     }
 
@@ -155,6 +165,7 @@ public class insuranceVentasMesMarca extends DefaultHandler {
             LOG.severe("No file to process. Usage is:" + "\njava DeptSalesReport <keyword>");
             return;
         }
+        modelo = args[1].toLowerCase();
         File xmlFile = new File(args[0] );
         insuranceVentasMesMarca handler = new insuranceVentasMesMarca();
         handler.process( xmlFile );

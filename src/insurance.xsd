@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="dataset" type="datasetType"/>
+  <xs:complexType name="insurance_recordType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="id"/>
+      <xs:element type="xs:string" name="first_name"/>
+      <xs:element type="xs:string" name="last_name"/>
+      <xs:element type="xs:string" name="phone"/>
+      <xs:element type="xs:string" name="car"/>
+      <xs:element type="xs:string" name="model"/>
+      <xs:element type="xs:string" name="insurance"/>
+      <xs:element type="xs:string" name="contract_date"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="datasetType">
+    <xs:sequence>
+      <xs:element type="insurance_recordType" name="insurance_record" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
